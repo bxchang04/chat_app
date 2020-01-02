@@ -37,6 +37,7 @@ export default class App extends React.Component {
      </ImageBackground>
    );
   }
+}
 
 const styles = StyleSheet.create({
   backImage:{
