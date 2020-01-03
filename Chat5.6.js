@@ -2,6 +2,8 @@ import React from 'react'
 import { GiftedChat, Bubble } from 'react-native-gifted-chat'
 import { StyleSheet, View, Platform, AsyncStorage, Text, Button, FlatList } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer'
+import * as Location from 'expo-location';
+import MapView from 'react-native-maps';
 
 const firebase = require('firebase');
 require('firebase/firestore');
@@ -23,6 +25,9 @@ class App extends React.Component {
       messages: [],
       uid: 0,
       loggedInText: 'Please wait, you are getting logged in',
+      //5.6
+      image: null,
+      location: null
     };
   }
 
@@ -165,12 +170,35 @@ class App extends React.Component {
     )
   }
 
+  renderCustomView (props) {
+     const { currentMessage} = props;
+     if (currentMessage.location) {
+       return (
+           <MapView
+             style={{width: 150,
+               height: 100,
+               borderRadius: 13,
+               margin: 3}}
+             region={{
+               latitude: currentMessage.location.latitude,
+               longitude: currentMessage.location.longitude,
+               latitudeDelta: 0.0922,
+               longitudeDelta: 0.0421,
+             }}
+           />
+       );
+     }
+     return null;
+   }
+
   render() {
     return (
       <View style={{flex:1, backgroundColor:'green'}}>
         <GiftedChat
           renderBubble={this.renderBubble}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
+          renderActions={this.renderCustomActions}
+          renderCustomView={this.renderCustomView.bind(this)}
           messages={this.state.messages}
           onSend={messages => this.onSend(messages)}
           user={{
@@ -179,7 +207,38 @@ class App extends React.Component {
 
         />
         {Platform.OS === 'android' ? <KeyboardSpacer /> : null }
+
+        //Location features
+        <Button
+          title="Pick an image from the library"
+          onPress={this.pickImage}
+        />
+
+        <Button
+          title="Take a photo"
+          onPress={this.takePhoto}
+        />
+
+        {this.state.image &&
+          <Image source={{ uri: this.state.image.uri }} style={{ width: 200, height: 200 }} />}
+
+        <Button
+          title="Get my location"
+          onPress={this.getLocation}
+        />
+
+        {this.state.location &&
+          <MapView
+            style={{ width: 300, height: 200 }}
+            region={{
+              latitude: this.state.location.coords.latitude,
+              longitude: this.state.location.coords.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          />}
       </View>
+
     )
   }
 }
