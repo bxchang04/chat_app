@@ -12,43 +12,53 @@ export default class CustomActions extends React.Component {
   //Location features
   pickImage = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    if (status === 'granted') {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'Images',
-      }).catch(error => console.log(error));
+    try {
+      if (status === 'granted') {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: 'Images',
+        }).catch(error => console.log(error));
 
-      if (!result.cancelled) {
-        this.setState({
-          image: result
-        });
+        if (!result.cancelled) {
+          this.setState({
+            image: result
+          });
+        }
+
       }
-
+    } catch (error) {
+      console.log(error.message);
     }
   }
 
   takePhoto = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL, Permissions.CAMERA);
-    if (status === 'granted') {
-      let result = await ImagePicker.launchCameraAsync().catch(error => console.log(error));
-
+      if (status === 'granted') {
+        let result = await ImagePicker.launchCameraAsync().catch(error => console.log(error));
+    try {
       if (!result.cancelled) {
         this.setState({
           image: result
         });
       }
+    } catch (error) {
+      console.log(error.message);
     }
   }
 
   getLocation = async () => {
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status === 'granted') {
-      let result = await Location.getCurrentPositionAsync({}).catch(error => console.log(error));
+    try {
+      if (status === 'granted') {
+        let result = await Location.getCurrentPositionAsync({}).catch(error => console.log(error));
 
-      if (result) {
-        this.setState({
-          location: result
-        });
+        if (result) {
+          this.setState({
+            location: result
+          });
+        }
       }
+    } catch (error) {
+      console.log(error.message);
     }
   }
 
@@ -128,7 +138,6 @@ export default class CustomActions extends React.Component {
       </TouchableOpacity>
     );
   }
-
 }
 
 const styles = StyleSheet.create({
@@ -154,5 +163,5 @@ const styles = StyleSheet.create({
 });
 
 CustomActions.contextTypes = {
- actionSheet: PropTypes.func,
+  actionSheet: PropTypes.func,
 };
